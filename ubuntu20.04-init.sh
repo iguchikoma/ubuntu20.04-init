@@ -144,6 +144,18 @@ function setup-docker-compose(){
 
 }
 
+# Setup nodejs and npm
+# ref: https://qiita.com/seibe/items/36cef7df85fe2cefa3ea
+function setup-nodejs(){
+
+  sudo apt update
+  sudo apt install -y nodejs npm
+  sudo npm install -g n
+  sudo n stable
+  sudo apt purge -y nodejs npm
+
+}
+
 # Main Function
 function main() {
   : "Start to configure ubuntu20.04"
@@ -158,6 +170,7 @@ function main() {
   configure-docker-to-start-on-boot
   configure-docker-logrotate
   setup-docker-compose
+  setup-nodejs
 
   : "Done for the configuration for ubuntu20.04"
 }
