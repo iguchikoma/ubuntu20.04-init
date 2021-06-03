@@ -80,6 +80,70 @@ EOF
 
 }
 
+# Setup Docker
+# ref: https://docs.docker.com/engine/install/ubuntu/
+function setup-docker(){
+
+  sudo apt-get remove docker docker-engine docker.io containerd runc
+  sudo apt-get update
+  sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+  echo \
+    "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  sudo apt-get update
+  sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+}
+
+# Setup to enable non sudo docker command
+# ref: https://docs.docker.com/engine/install/linux-postinstall/
+function setup-non-sudo-docker(){
+
+  sudo usermod -aG docker $USER
+
+}
+
+# Configure Docker to start on boot
+# ref: https://docs.docker.com/engine/install/linux-postinstall/
+function configure-docker-to-start-on-boot(){
+
+  sudo systemctl enable docker.service
+  sudo systemctl enable containerd.service
+
+}
+
+# Configure Docker logrotate
+# ref: https://docs.docker.com/config/containers/logging/json-file/
+function configure-docker-logrotate() {
+
+  ls /etc/docker/daemon.json ||\
+  sudo tee /etc/docker/daemon.json <<EOF
+{
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  }
+}
+EOF
+
+}
+
+# Setup Docker compose
+# ref: https://docs.docker.com/compose/install/
+function setup-docker-compose(){
+
+  sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo chmod +x /usr/local/bin/docker-compose
+
+}
+
 # Main Function
 function main() {
   : "Start to configure ubuntu20.04"
@@ -89,6 +153,11 @@ function main() {
   setup-git
   setup-ls-color
   setup-pyenv
+  setup-docker
+  setup-non-sudo-docker
+  configure-docker-to-start-on-boot
+  configure-docker-logrotate
+  setup-docker-compose
 
   : "Done for the configuration for ubuntu20.04"
 }
