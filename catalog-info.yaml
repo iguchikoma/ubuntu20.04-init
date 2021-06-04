@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ubuntu20.04-init
+  annotations:
+    github.com/project-slug: iguchikoma/ubuntu20.04-init
+spec:
+  type: other
+  lifecycle: unknown
+  owner: iguchikoma
